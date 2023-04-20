@@ -1,9 +1,8 @@
 package edu.upc.dsa.services;
 
 
-import edu.upc.dsa.TracksManager;
-import edu.upc.dsa.TracksManagerImpl;
-import edu.upc.dsa.models.Track;
+import edu.upc.dsa.GameManager;
+import edu.upc.dsa.GameManagerImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -13,17 +12,16 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
 import java.util.List;
 
 @Api(value = "/tracks", description = "Endpoint to Track Service")
 @Path("/tracks")
 public class TracksService {
 
-    private TracksManager tm;
+    private GameManager tm;
 
     public TracksService() {
-        this.tm = TracksManagerImpl.getInstance();
+        this.tm = GameManagerImpl.getInstance();
         if (tm.size()==0) {
             this.tm.addTrack("La Barbacoa", "Georgie Dann");
             this.tm.addTrack("Despacito", "Luis Fonsi");
