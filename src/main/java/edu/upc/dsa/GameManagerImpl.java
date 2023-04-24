@@ -16,21 +16,23 @@ public class GameManagerImpl implements GameManager {
         this.game = new Game();
     }
 
+    public Game getGame() {
+        return this.game;
+    }
+
     public static GameManager getInstance() {
         if (instance==null) instance = new GameManagerImpl();
         return instance;
     }
 
     @Override
-    public void createGame(int n, int p) throws Exception {
+    public void createGame(int n, int p) {
         if (n < 2) {logger.warn("number of teams too small");}
         else if (this.game.getState() == State.NO_INICIADO){
             this.game.create(n,p);
-            this.game.setState(State.INICIADO_EN_PREPARACION);
             logger.info("game created");
         } else {
             logger.warn("game is already created");
-            throw new Exception();
         }
     }
 
@@ -51,7 +53,7 @@ public class GameManagerImpl implements GameManager {
     }
 
     @Override
-    public void buyProduct(String productId, String playerId) throws Exception {
+    public void buyProduct(String productId, String playerId) {
         if (Player.playersMap.containsKey(playerId) && Product.Shop.containsKey(productId)) {
             Player pl = Player.playersMap.get(playerId);
             Product pr = Product.Shop.get(productId);
@@ -69,18 +71,27 @@ public class GameManagerImpl implements GameManager {
         try {
             if (!Player.playersMap.containsKey(playerId)) {
                 logger.warn("player not found");
-            } else {
-                List<Team> teams = this.game.getTeams();
-                Player p = Player.playersMap.get(playerId);
-                for (int i = 1; i < teams.size(); i++) {
-                    if (teams.get(i - 1).getPlayers().size() == 0) {
-                        teams.get(i - 1).addPlayer(p);
-                    } else if (teams.get(i - 1).getPlayers().size() == teams.get(i).getPlayers().size()) {
-                        teams.get(i - 1).addPlayer(p);
-                    }
-                }
             }
-        } catch (Exception e) {logger.warn("teams are full");}
+
+            List<Team> teams = this.game.getTeams();
+            Player p = Player.playersMap.get(playerId);
+
+            if (teams.get(teams.size()-1).getPlayers().size() == teams.get(0).getNplayers()) {
+                logger.warn("teams are full");
+                this.game.setState(State.INICIADO_EN_FUNCIONAMIENTO);
+            }
+            else if (teams.get(0).getPlayers().size() == teams.get(teams.size()-1).getPlayers().size()){
+                teams.get(0).addPlayer(p);
+                logger.info("player add in the team 0");
+            } else {
+                int i = 0;
+                while (teams.get(i).getPlayers().size() <= teams.get(i+1).getPlayers().size()) {
+                    i += 1;
+                }
+                teams.get(i+1).addPlayer(p);
+                logger.info("player add in the team " + (i + 1));
+            }
+        } catch (Exception e) {logger.warn("error");}
     }
 
     @Override
